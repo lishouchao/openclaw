@@ -1,0 +1,889 @@
+# OpenClaw 安装指南
+
+---
+
+# 第一部分：准备工作 - 安装 Node.js
+
+OpenClaw 需要 **Node.js 24.x**（推荐）或 **22.16+**
+
+## Windows
+
+### 方式一：官网下载（推荐新手）
+
+1. 访问 https://nodejs.org
+2. 下载 **LTS 版本**（长期支持版）
+3. 双击安装包，一路下一步
+
+### 方式二：使用 Scoop
+
+```powershell
+scoop install nodejs
+```
+
+### 方式三：使用 winget
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+```
+
+---
+
+## macOS
+
+### 方式一：官网下载
+
+1. 访问 https://nodejs.org
+2. 下载 **LTS 版本**
+3. 双击安装包安装
+
+### 方式二：使用 Homebrew
+
+```bash
+brew install node
+```
+
+---
+
+## Linux
+
+### Ubuntu / Debian
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+### CentOS / RHEL / Fedora
+
+```bash
+curl -fsSL https://rpm.nodesource.com/setup_24.x | sudo bash -
+sudo dnf install -y nodejs
+```
+
+---
+
+## 设置国内镜像源（加速下载）
+
+### 淘宝镜像（推荐）
+
+```bash
+npm config set registry https://registry.npmmirror.com
+```
+
+### 腾讯云镜像
+
+```bash
+npm config set registry https://mirrors.cloud.tencent.com/npm/
+```
+
+### 华为云镜像
+
+```bash
+npm config set registry https://repo.huaweicloud.com/repository/npm/
+```
+
+### 阿里云镜像
+
+```bash
+npm config set registry https://npm.aliyun.com
+```
+
+---
+
+### 验证当前源
+
+```bash
+npm config get registry
+```
+
+### 恢复官方源
+
+```bash
+npm config set registry https://registry.npmjs.org
+```
+
+---
+
+## 验证安装
+
+```bash
+node -v
+npm -v
+```
+
+如果显示版本号，说明安装成功。
+
+> **npm 随 Node.js 一起安装**，无需单独安装。
+
+---
+
+# 第二部分：OpenClaw 安装配置
+
+## 安装 OpenClaw
+
+```bash
+npm install -g openclaw@latest
+```
+
+或使用 pnpm：
+
+```bash
+pnpm add -g openclaw@latest
+```
+
+---
+
+## 运行安装向导
+
+```bash
+openclaw onboard --install-daemon
+```
+
+### 向导流程
+
+安装向导会引导你完成以下步骤：
+
+#### 1. 安全提示确认
+阅读并确认安全注意事项。
+
+#### 2. 选择模式
+- **快速开始（quickstart）**（推荐）- 最少提示，使用默认值
+- **高级模式（manual/advanced）** - 完全控制所有选项
+
+#### 3. 配置 AI 模型提供商
+
+| 提供商 | 说明 |
+|--------|------|
+| OpenAI | ChatGPT / GPT-4 |
+| Anthropic | Claude |
+| DeepSeek | 国产大模型 |
+| Moonshot | 月之暗面 Kimi |
+| ZAI | 智谱 AI |
+| Mistral | 开源大模型 |
+| xAI | Grok |
+| Gemini | Google AI |
+| Ollama | 本地模型（免费） |
+| 自定义 API | 兼容 OpenAI/Anthropic 接口 |
+
+> 掯密钥输入时，国内用户可能需要科学上网才能验证 API Key。
+
+#### 4. 设置工作区
+默认位置：`~/.openclaw/workspace`
+
+#### 5. 配置 Gateway 网关
+- 端口：默认 `18789`
+- 绑定地址：默认 `loopback`（本地）
+- 认证方式：Token / Password / 无
+
+#### 6. 配置消息渠道（可选）
+- WhatsApp
+- Telegram
+- Discord
+- Slack
+- Signal
+- 微信等
+
+> 渠道可以稍后通过 `openclaw configure` 配置。
+
+#### 7. 安装守护进程
+- **macOS**：安装 LaunchAgent
+- **Linux**：安装 systemd 用户服务
+- **Windows**：安装到启动文件夹（推荐使用 WSL2）
+
+#### 8. 健康检查
+验证 Gateway 是否正常运行。
+
+### 快速开始模式默认值
+
+| 配置项 | 默认值 |
+|--------|--------|
+| 网关端口 | 18789 |
+| 绑定地址 | loopback（127.0.0.1） |
+| 认证方式 | Token（自动生成） |
+| 工作区 | ~/.openclaw/workspace |
+| Tailscale | 关闭 |
+
+### 常用向导命令
+
+```bash
+# 快速开始（推荐新手）
+openclaw onboard --flow quickstart
+
+# 高级模式（完全控制）
+openclaw onboard --flow manual
+
+# 安装守护进程并运行
+openclaw onboard --install-daemon
+
+# 连接远程网关
+openclaw onboard --mode remote --remote-url wss://your-server:18789
+
+# 非交互式（自动化脚本）
+openclaw onboard --non-interactive --auth-choice skip --accept-risk
+
+# 重置配置
+openclaw onboard --reset
+```
+
+### 可选 Skills（技能）
+
+安装向导最后会让你选择要安装的 Skills。
+
+#### 入门推荐（Windows 用户必选）
+
+| Skill | 功能说明 | 推荐理由 |
+|-------|----------|----------|
+| **summarize** | 网页/播客/文件摘要 | 最常用，总结任何内容 |
+| **weather** | 天气查询 | 简单实用，无需 API Key |
+| **github** | GitHub 操作 | 开发者必备 |
+
+#### 可选安装（按需选择）
+
+| Skill | 功能说明 | 平台 |
+|-------|----------|------|
+| **notion** | Notion 笔记/数据库管理 | 跨平台 |
+| **trello** | Trello 看板管理 | 跨平台 |
+| **slack** | Slack 消息操作 | 跨平台 |
+| **discord** | Discord 消息操作 | 跨平台 |
+| **openhue** | Philips Hue 灯光控制 | 跨平台 |
+| **spotify-player** | Spotify 播放控制 | 跨平台 |
+| **gemini** | Gemini AI 问答 | 跨平台 |
+| **openai-whisper** | 本地语音转文字 | 跨平台 |
+
+#### macOS 专用（Windows 用户无需安装）
+
+| Skill | 功能说明 |
+|-------|----------|
+| apple-notes | Apple 备忘录 |
+| apple-reminders | Apple 提醒事项 |
+| bear-notes | Bear 笔记 |
+| things-mac | Things 3 任务管理 |
+| peekaboo | macOS UI 自动化 |
+| imsg | iMessage/SMS |
+
+> **提示**：Skills 可以随时安装，建议新手先选 `summarize` 和 `weather`，其他的按需安装。
+>
+> ```bash
+> # 稍后安装更多 Skills
+> openclaw skills install github
+> openclaw skills install notion
+> ```
+
+---
+
+# 第三部分：配置飞书通道
+
+飞书（Lark）是企业常用的团队协作平台。配置后，你可以在飞书中与 AI 助手对话。
+
+## 前置条件
+
+- 飞书账号（企业管理员权限更佳）
+- OpenClaw 已安装并运行
+
+---
+
+## 第 1 步：创建飞书应用
+
+### 1. 打开飞书开放平台
+
+访问 https://open.feishu.cn/app 并登录。
+
+> 国际版 Lark 用户请使用 https://open.larksuite.com/app
+
+### 2. 创建企业应用
+
+1. 点击 **创建企业自建应用**
+2. 填写应用名称（如：AI 助手）
+3. 选择应用图标
+4. 点击创建
+
+### 3. 获取凭证
+
+在 **凭证与基础信息** 中复制：
+
+- **App ID**（格式：`cli_xxx`）
+- **App Secret**
+
+> ⚠️ **重要**：App Secret 请妥善保管，不要泄露。
+
+### 4. 配置权限
+
+在 **权限管理** 中，点击 **批量添加**，粘贴以下权限配置：
+
+```json
+{
+  "scopes": {
+    "tenant": [
+      "application:application:self_manage",     // 应用自管理
+      "cardkit:card:read",                       // 读取消息卡片
+      "cardkit:card:write",                      // 发送消息卡片
+      "contact:contact.base:readonly",           // 读取联系人基础信息
+      "docx:document:readonly",                  // 读取文档
+      "im:chat:read",                            // 读取群聊信息
+      "im:chat:update",                          // 更新群聊信息
+      "im:message.group_at_msg:readonly",        // 读取群聊@消息
+      "im:message.p2p_msg:readonly",             // 读取私聊消息
+      "im:message.pins:read",                    // 读取置顶消息
+      "im:message.pins:write_only",              // 设置置顶消息
+      "im:message.reactions:read",               // 读取消息表情反应
+      "im:message.reactions:write_only",         // 添加消息表情反应
+      "im:message:readonly",                     // 读取消息
+      "im:message:recall",                       // 撤回消息
+      "im:message:send_as_bot",                  // 以机器人身份发消息
+      "im:message:send_multi_users",             // 批量发送消息
+      "im:message:send_sys_msg",                 // 发送系统消息
+      "im:message:update",                       // 更新消息
+      "im:resource"                              // 消息资源访问
+    ],
+    "user": [
+      "base:app:copy",                           // 复制多维表格应用
+      "base:app:create",                         // 创建多维表格应用
+      "base:app:read",                           // 读取多维表格应用
+      "base:app:update",                         // 更新多维表格应用
+      "base:field:create",                       // 创建字段
+      "base:field:delete",                       // 删除字段
+      "base:field:read",                         // 读取字段
+      "base:field:update",                       // 更新字段
+      "base:record:create",                      // 创建记录
+      "base:record:delete",                      // 删除记录
+      "base:record:retrieve",                    // 查询记录
+      "base:record:update",                      // 更新记录
+      "base:table:create",                       // 创建数据表
+      "base:table:delete",                       // 删除数据表
+      "base:table:read",                         // 读取数据表
+      "base:table:update",                       // 更新数据表
+      "base:view:read",                          // 读取视图
+      "base:view:write_only",                    // 创建/更新视图
+      "board:whiteboard:node:create",            // 创建白板节点
+      "board:whiteboard:node:read",              // 读取白板节点
+      "calendar:calendar.event:create",          // 创建日历事件
+      "calendar:calendar.event:delete",          // 删除日历事件
+      "calendar:calendar.event:read",            // 读取日历事件
+      "calendar:calendar.event:reply",           // 回复日历事件
+      "calendar:calendar.event:update",          // 更新日历事件
+      "calendar:calendar.free_busy:read",        // 读取忙闲状态
+      "calendar:calendar:read",                  // 读取日历
+      "contact:user.employee_id:readonly",       // 读取员工工号
+      "contact:user:search",                     // 搜索用户
+      "docs:document.comment:create",            // 创建文档评论
+      "docs:document.comment:read",              // 读取文档评论
+      "docs:document.comment:update",            // 更新文档评论
+      "docs:document.media:download",            // 下载文档媒体文件
+      "docs:document.media:upload",              // 上传文档媒体文件
+      "docs:document:copy",                      // 复制文档
+      "docs:document:export",                    // 导出文档
+      "docx:document:create",                    // 创建文档
+      "docx:document:readonly",                  // 读取文档
+      "docx:document:write_only",                // 编辑文档
+      "drive:drive.metadata:readonly",           // 读取云空间元数据
+      "drive:file:download",                     // 下载云盘文件
+      "drive:file:upload",                       // 上传云盘文件
+      "im:chat.members:read",                    // 读取群成员
+      "im:message",                              // 发送消息
+      "im:message.group_msg:get_as_user",        // 获取群消息（用户身份）
+      "im:message.p2p_msg:get_as_user",          // 获取私聊消息（用户身份）
+      "offline_access",                          // 离线访问
+      "search:docs:read",                        // 搜索文档
+      "search:message",                          // 搜索消息
+      "sheets:spreadsheet.meta:read",            // 读取表格元数据
+      "sheets:spreadsheet:create",               // 创建电子表格
+      "sheets:spreadsheet:read",                 // 读取电子表格
+      "sheets:spreadsheet:write_only",           // 编辑电子表格
+      "space:document:delete",                   // 删除空间文档
+      "space:document:move",                     // 移动空间文档
+      "space:document:retrieve",                 // 获取空间文档
+      "task:comment:read",                       // 读取任务评论
+      "task:comment:write",                      // 写入任务评论
+      "task:task:read",                          // 读取任务
+      "task:task:write",                         // 写入任务
+      "task:task:writeonly",                     // 仅写入任务
+      "task:tasklist:read",                      // 读取任务列表
+      "task:tasklist:write",                     // 写入任务列表
+      "wiki:node:copy",                          // 复制知识库节点
+      "wiki:node:create",                        // 创建知识库节点
+      "wiki:node:move",                          // 移动知识库节点
+      "wiki:node:read",                          // 读取知识库节点
+      "wiki:node:retrieve",                      // 获取知识库节点
+      "wiki:space:read",                         // 读取知识库空间
+      "wiki:space:retrieve",                     // 获取知识库空间
+      "wiki:space:write_only"                    // 写入知识库空间
+    ]
+  }
+}
+```
+
+> **权限说明**：
+> - **tenant 权限**：应用级别，用于机器人基础功能（消息收发、卡片、群聊等）
+> - **user 权限**：用户级别，用于访问文档、日历、任务、知识库、多维表格等高级功能
+>
+> ⚠️ **注意**：JSON 中的注释 `//` 仅用于说明，粘贴到飞书时可以删除，也可以保留（飞书会忽略）。
+
+### 5. 启用机器人
+
+在 **应用能力** → **机器人** 中：
+
+1. 启用机器人能力
+2. 设置机器人名称
+
+### 6. 配置事件订阅
+
+在 **事件订阅** 中：
+
+1. 选择 **使用长连接接收事件**（WebSocket）
+2. 添加事件：`im.message.receive_v1`
+
+> ⚠️ **注意**：需要先运行 OpenClaw Gateway，否则长连接无法保存。
+
+### 7. 发布应用
+
+1. 在 **版本管理与发布** 中创建版本
+2. 提交审核
+3. 等待批准（企业应用通常自动批准）
+
+---
+
+## 第 2 步：配置 OpenClaw
+
+### 方式一：使用向导（推荐）
+
+```bash
+openclaw channels add
+```
+
+选择 **Feishu**，然后粘贴 App ID 和 App Secret。
+
+### 方式二：编辑配置文件
+
+编辑 `~/.openclaw/openclaw.json`：
+
+```json
+{
+  "channels": {
+    "feishu": {
+      "enabled": true,
+      "accounts": {
+        "main": {
+          "appId": "cli_xxx",
+          "appSecret": "你的App Secret"
+        }
+      }
+    }
+  }
+}
+```
+
+### 方式三：环境变量
+
+```bash
+export FEISHU_APP_ID="cli_xxx"
+export FEISHU_APP_SECRET="你的App Secret"
+```
+
+---
+
+## 第 3 步：启动并测试
+
+### 1. 启动网关
+
+```bash
+openclaw gateway
+```
+
+### 2. 在飞书中测试
+
+1. 在飞书中搜索你的机器人
+2. 发送一条消息
+
+### 3. 批准配对（首次使用）
+
+默认情况下，机器人会回复一个配对码。在终端中批准：
+
+```bash
+openclaw pairing approve feishu <配对码>
+```
+
+批准后即可正常聊天。
+
+---
+
+## 常用命令
+
+在飞书中发送：
+
+| 命令 | 说明 |
+|------|------|
+| `/status` | 查看机器人状态 |
+| `/reset` | 重置会话 |
+| `/model` | 显示/切换模型 |
+
+---
+
+## 故障排除
+
+**机器人没响应？**
+
+1. 检查网关是否运行：`openclaw gateway status`
+2. 检查日志：`openclaw logs --follow`
+3. 确认应用已发布并获批准
+4. 确认事件订阅包含 `im.message.receive_v1`
+
+**群聊中没响应？**
+
+1. 确保机器人已加入群组
+2. 需要 @ 提及机器人（默认行为）
+
+---
+
+## 国际版 Lark 配置
+
+如果你的租户在 Lark 国际版，需要设置域名：
+
+```json
+{
+  "channels": {
+    "feishu": {
+      "domain": "lark",
+      "accounts": {
+        "main": {
+          "appId": "cli_xxx",
+          "appSecret": "xxx"
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+# 第四部分：安装重要技能
+
+Skills 是 OpenClaw 的能力扩展模块，让 AI 助手能够执行更多任务。
+
+---
+
+## 方式一：使用 ClawHub（推荐）
+
+ClawHub 是 OpenClaw 的技能市场，提供丰富的社区技能。
+
+### 安装 ClawHub CLI
+
+```bash
+npm install -g clawhub
+```
+
+### 搜索技能
+
+```bash
+# 搜索技能
+clawhub search "摘要"
+clawhub search "天气"
+```
+
+### 安装技能
+
+```bash
+# 安装技能
+clawhub install summarize
+clawhub install weather
+clawhub install github
+
+# 安装指定版本
+clawhub install summarize --version 1.2.3
+```
+
+### 管理技能
+
+```bash
+# 查看已安装技能
+clawhub list
+
+# 更新单个技能
+clawhub update summarize
+
+# 更新所有技能
+clawhub update --all
+
+# 强制更新
+clawhub update --all --force
+```
+
+### 技能市场
+
+访问 https://clawhub.com 浏览更多技能。
+
+---
+
+## 方式二：使用 OpenClaw CLI
+
+OpenClaw 内置了技能管理命令。
+
+### 查看可用技能
+
+```bash
+# 列出所有可用技能
+openclaw skills list
+
+# 搜索技能
+openclaw skills search <关键词>
+```
+
+### 安装技能
+
+```bash
+# 安装技能
+openclaw skills install summarize
+openclaw skills install weather
+openclaw skills install github
+```
+
+### 管理已安装的技能
+
+```bash
+# 查看已安装的技能
+openclaw skills installed
+
+# 更新单个技能
+openclaw skills update summarize
+
+# 更新所有技能
+openclaw skills update --all
+
+# 卸载技能
+openclaw skills uninstall summarize
+```
+
+---
+
+## 推荐安装的技能
+
+### 🔥 热门必备
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **summarize** | `clawhub install summarize` | 网页/文件/视频摘要（最常用） |
+| **weather** | `clawhub install weather` | 天气查询（无需 API Key） |
+| **github** | `clawhub install github` | GitHub 操作（PR、Issue、CI） |
+
+### 💼 办公效率
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **notion** | `clawhub install notion` | Notion 笔记/数据库管理 |
+| **trello** | `clawhub install trello` | Trello 看板管理 |
+| **himalaya** | `clawhub install himalaya` | 邮件管理（IMAP/SMTP） |
+| **gog** | `clawhub install gog` | Google Workspace（Gmail/日历/Drive） |
+
+### 🤖 AI 增强
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **gemini** | `clawhub install gemini` | Gemini AI 问答 |
+| **oracle** | `clawhub install oracle` | Prompt 管理/文件捆绑 |
+| **openai-whisper** | `clawhub install openai-whisper` | 本地语音转文字（免费） |
+| **openai-whisper-api** | `clawhub install openai-whisper-api` | OpenAI 语音转文字 API |
+| **sherpa-onnx-tts** | `clawhub install sherpa-onnx-tts` | 本地文字转语音（离线） |
+| **sag** | `clawhub install sag` | ElevenLabs 文字转语音 |
+
+### 💻 开发工具
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **coding-agent** | `clawhub install coding-agent` | 编程代理（Codex/Claude Code） |
+| **skill-creator** | `clawhub install skill-creator` | 创建和编辑 Skills |
+| **gh-issues** | `clawhub install gh-issues` | 自动处理 GitHub Issue |
+| **mcporter** | `clawhub install mcporter` | MCP 服务器/工具调用 |
+
+### 🏠 智能家居
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **openhue** | `clawhub install openhue` | Philips Hue 灯光控制 |
+| **sonoscli** | `clawhub install sonoscli` | Sonos 音箱控制 |
+| **spotify-player** | `clawhub install spotify-player` | Spotify 播放控制 |
+
+### 🔧 系统工具
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **healthcheck** | `clawhub install healthcheck` | 主机安全加固检查 |
+| **node-connect** | `clawhub install node-connect` | 诊断节点连接问题 |
+| **session-logs** | `clawhub install session-logs` | 会话日志搜索分析 |
+| **tmux** | `clawhub install tmux` | 远程控制 tmux 会话 |
+
+### 📱 通讯工具
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **slack** | `clawhub install slack` | Slack 消息操作 |
+| **discord** | `clawhub install discord` | Discord 消息操作 |
+| **bluebubbles** | `clawhub install bluebubbles` | iMessage 消息（推荐） |
+
+### 🎬 多媒体
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **video-frames** | `clawhub install video-frames` | 视频帧提取 |
+| **gifgrep** | `clawhub install gifgrep` | GIF 搜索下载 |
+| **songsee** | `clawhub install songsee` | 音频频谱可视化 |
+| **camsnap** | `clawhub install camsnap` | 摄像头截图（RTSP/ONVIF） |
+
+### 🍎 macOS 专用
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **apple-notes** | `clawhub install apple-notes` | Apple 备忘录 |
+| **apple-reminders** | `clawhub install apple-reminders` | Apple 提醒事项 |
+| **obsidian** | `clawhub install obsidian` | Obsidian 笔记 |
+| **things-mac** | `clawhub install things-mac` | Things 3 任务管理 |
+| **peekaboo** | `clawhub install peekaboo` | macOS UI 自动化 |
+
+### 🌐 第三方 AI 服务
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **openrouter** | `clawhub install openrouter` | OpenRouter API |
+| **deepseek** | `clawhub install deepseek` | DeepSeek API |
+| **mistral** | `clawhub install mistral` | Mistral API |
+| **xai** | `clawhub install xai` | xAI (Grok) API |
+| **moonshot** | `clawhub install moonshot` | 月之暗面 Kimi API |
+
+### 🧠 高级扩展（Agent 增强）
+
+| 技能 | 安装命令 | 功能说明 |
+|------|----------|----------|
+| **find-skill** | `clawhub install find-skill` | 智能搜索和发现 Skills |
+| **skill-vetter** | `clawhub install skill-vetter` | Skills 审核和质量检查 |
+| **self-improving-agent** | `clawhub install self-improving-agent` | 自我改进型 Agent |
+| **agent-memory** | `clawhub install agent-memory` | Agent 记忆系统 |
+| **memory-system** | `clawhub install memory-system` | 完整记忆管理架构 |
+| **ontology** | `clawhub install ontology` | 知识本体/概念图谱 |
+
+> **提示**：这些高级扩展技能适合进阶用户，可以显著增强 Agent 的能力和智能程度。
+
+---
+
+### 批量安装示例
+
+```bash
+# 安装基础必备
+clawhub install summarize weather github
+
+# 安装办公套件
+clawhub install notion trello himalaya
+
+# 安装开发工具
+clawhub install coding-agent gh-issues mcporter
+```
+
+---
+
+## 技能使用示例
+
+### summarize（摘要）
+
+```
+你：请总结这篇文章 https://example.com/article
+AI：[自动调用 summarize 技能生成摘要]
+```
+
+### weather（天气）
+
+```
+你：北京今天天气怎么样？
+AI：[调用 weather 技能查询并回复]
+```
+
+### github
+
+```
+你：查看 openclaw/openclaw 最近的 PR
+AI：[调用 github 技能列出 PR]
+```
+
+---
+
+## 技能安装位置
+
+技能安装在以下目录：
+
+```
+~/.openclaw/skills/
+├── summarize/
+├── weather/
+├── github/
+└── ...
+```
+
+---
+
+## 手动安装技能（高级）
+
+从本地目录或 Git 仓库安装：
+
+```bash
+# 从本地目录安装
+openclaw skills install ./my-skill
+
+# 从 Git 仓库安装
+openclaw skills install https://github.com/user/skill-name
+```
+
+### 配置完成后
+
+```bash
+# 启动网关
+openclaw gateway
+
+# 打开控制面板（浏览器）
+openclaw dashboard
+
+# 与 AI 对话
+openclaw agent --message "你好"
+```
+
+---
+
+## 验证安装
+
+```bash
+# 查看版本
+openclaw --version
+
+# 查看帮助
+openclaw --help
+```
+
+---
+
+## 常用命令
+
+| 命令 | 说明 |
+|------|------|
+| `openclaw onboard` | 新手引导 |
+| `openclaw gateway` | 启动网关服务 |
+| `openclaw agent` | 与 AI 对话 |
+| `openclaw doctor` | 诊断问题 |
+| `openclaw update` | 更新到最新版本 |
+| `openclaw config` | 查看配置 |
+
+---
+
+## 常见问题
+
+**Q: 安装后找不到 `openclaw` 命令？**
+
+重新打开终端窗口，或检查 npm 全局路径是否在 PATH 中：
+
+```bash
+npm config get prefix
+```
+
+**Q: 权限错误？**
+
+Windows：以管理员身份运行 PowerShell
+
+Linux/macOS：
+```bash
+sudo npm install -g openclaw@latest
+```
